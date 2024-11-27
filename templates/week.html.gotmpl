@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Activity Plan</title>
+    <meta charset="UTF-8" />
+    <style>
+      * {
+        font-size: 8pt;
+        font-family: Helvetica, Arial, sans-serif;
+      }
+
+      .container {
+        display: grid;
+        grid-column-gap: 0;
+        grid-row-gap: 3px;
+      }
+
+      .time {
+        grid-column-start: 1;
+      }
+
+      .span1 {
+        grid-column-end: span 1 !important;
+      }
+
+      {{range .Centers -}}
+        {{$centerId := .CenterId -}}
+        {{$times := $.Times | len}}
+        .container.center{{$centerId}} {
+          grid-template-columns: {{.GridColumns}};
+          grid-template-rows: 30px repeat({{$times}}, 1fr);
+        }
+
+        .center{{$centerId}} > .weekday {
+          border: 1px solid black;
+          border-left: none;
+
+          grid-row: 2 / -1;
+        }
+        .center{{$centerId}} > .weekday.Sunday {
+          border-left: 1px solid black;
+        }
+
+        {{$weekdayViews := .Weekdays -}}
+        {{range $i, $wd := $.Days -}}
+          {{$wdv := index $weekdayViews $i -}}
+          {{$name := .Name -}}
+          .center{{$centerId}} > .{{$name}} {
+            grid-column-end: span {{$wdv.Span}};
+          }
+
+          {{range $offset, $column := $wdv.GridColumns -}}
+          {{if eq $offset 0}}.center{{$centerId}} > .{{$name}},{{end}}
+          .center{{$centerId}} > .{{$name}}.offset{{$offset}} {
+            grid-column-start: {{$column}};
+            {{if gt $offset 0}}grid-column-end: span 1;{{end}}
+          }
+          {{end}}
+        {{end}}
+      {{end}}
+
+      {{range .Times -}}
+        .time{{.Code}} { grid-row-start: {{.GridRow}}; }
+      {{end}}
+
+      .time {
+        height: 18px;
+      }
+
+      .duration30 {
+        height: 36px;
+        grid-row-end: span 2;
+      }
+      .duration45 {
+        height: 54px;
+        grid-row-end: span 3;
+      }
+      .duration60 {
+        height: 72px;
+        grid-row-end: span 4;
+      }
+
+      .activity {
+        border: 1px solid #666;
+        border-radius: 3px;
+        margin: 0 2px;
+        padding: 1px;
+        overflow: scroll;
+      }
+
+      a.activity {
+        color: black;
+        text-decoration: none;
+      }
+
+      a.activity:hover {
+        border-color: black;
+        filter: drop-shadow(1px 1px 2px);
+      }
+      
+    </style>
+  </head>
+  <body>
+    {{range .Centers -}}
+    <h1>{{.CenterName}}</h1>
+    <div class="container center{{.CenterId}}">
+      {{range $.Days -}}
+      <div class="weekday {{.Name}}"></div>
+      <div class="{{.Name}}">{{.ShortName}}</div>
+      {{end}}
+
+      {{range $.Times -}}
+      <div class="time time{{.Code}}">{{.Name}}</div>
+      {{end}}
+
+      {{range $i, $wd := .Weekdays -}}
+      {{$d := index $.Days $i}}
+      {{range .Events -}}
+      <a href="{{.Activity.DetailUrl}}" target="_blank" id="{{.Activity.Id}}" class="activity {{$d.Name}} time{{.StartTime}} offset{{.Offset}} duration{{.Duration}} span{{.Span}}" style="background-color: {{.BgColor | css}};">
+        {{.Activity.Name}}<br/>
+        {{.Activity.TimeRange}}
+      </a>
+      {{end}}
+      {{end}}
+    </div>
+    {{end}}
+  </body>
+</html>
