@@ -94,9 +94,19 @@ AB
 func NewViewEvent(a *Activity, prevEvent *ViewEvent, colourMap map[string]string) (*ViewEvent, error) {
 	offset := 0
 	if prevEvent != nil {
-		overlaps, err := prevEvent.Activity.Overlaps(a)
-		if err != nil {
-			return nil, err
+		var overlaps bool
+		var err error
+		for {
+			overlaps, err = prevEvent.Activity.Overlaps(a)
+			if err != nil {
+				return nil, err
+			}
+
+			if overlaps || prevEvent.Offset == 0 || prevEvent.prevEvent == nil {
+				break
+			} else {
+				prevEvent = prevEvent.prevEvent
+			}
 		}
 
 		if overlaps {
