@@ -224,7 +224,7 @@ func promptSeason(filters models.FiltersBody, defaultId string) (models.Criteriu
 
 	seasonItems := []string{}
 	for _, s := range filters.Seasons {
-		seasonItems = append(seasonItems, s.Description)
+		seasonItems = append(seasonItems, fmt.Sprintf("%v (%v)", s.Description, s.Id))
 	}
 
 	prompt := promptui.Select{
@@ -251,7 +251,7 @@ func promptCenter(filters models.FiltersBody, defaultId string) (models.Criteriu
 
 	centerItems := []string{}
 	for _, c := range filters.Centers {
-		centerItems = append(centerItems, c.Description)
+		centerItems = append(centerItems, fmt.Sprintf("%v (%v)", c.Description, c.Id))
 	}
 
 	prompt := promptui.Select{
@@ -278,7 +278,7 @@ func promptCategory(filters models.FiltersBody, defaultId string) (models.Criter
 
 	categoryItems := []string{}
 	for _, c := range filters.Categories {
-		categoryItems = append(categoryItems, c.Description)
+		categoryItems = append(categoryItems, fmt.Sprintf("%v (%v)", c.Description, c.Id))
 	}
 
 	prompt := promptui.Select{
