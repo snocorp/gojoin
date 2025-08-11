@@ -65,24 +65,22 @@ func GetFilters(options GetFiltersOptions) (body models.FiltersBody, err error) 
 			return models.FiltersBody{}, err
 		}
 
-		if useCache {
-			wd, err := os.Getwd()
-			if err != nil {
-				return body, err
+		wd, err := os.Getwd()
+		if err != nil {
+			return body, err
+		}
+
+		cacheDir := path.Join(wd, ".gojoin", "cache")
+
+		err = os.MkdirAll(cacheDir, 0775)
+		if err != nil {
+			if options.Verbose {
+				fmt.Println(err)
 			}
-
-			cacheDir := path.Join(wd, ".gojoin", "cache")
-
-			err = os.MkdirAll(cacheDir, 0775)
-			if err != nil {
-				if options.Verbose {
-					fmt.Println(err)
-				}
-			} else {
-				err = os.WriteFile(path.Join(cacheDir, "filters.json"), filterBytes, 0664)
-				if err != nil && options.Verbose {
-					fmt.Println(err)
-				}
+		} else {
+			err = os.WriteFile(path.Join(cacheDir, "filters.json"), filterBytes, 0664)
+			if err != nil && options.Verbose {
+				fmt.Println(err)
 			}
 		}
 	}

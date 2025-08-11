@@ -27,8 +27,14 @@ func getOptions(cmd *cobra.Command) (*LoadOptions, error) {
 		return nil, err
 	}
 
+	noCache, err := cmd.Flags().GetBool("nocache")
+	if err != nil {
+		return nil, err
+	}
+
 	options := internal.GetFiltersOptions{
 		Verbose: verbose,
+		NoCache: noCache,
 	}
 	filters, err := internal.GetFilters(options)
 	if err != nil {
@@ -211,6 +217,9 @@ func init() {
 
 	loadCmd.Flags().String("person", "", "The person with which the events will be associated")
 	loadCmd.MarkFlagRequired("person")
+
+	loadCmd.Flags().Bool("verbose", false, "Enable verbose output")
+	loadCmd.Flags().Bool("nocache", false, "Disable cache for filters")
 }
 
 func promptSeason(filters models.FiltersBody, defaultId string) (models.Criterium, error) {
